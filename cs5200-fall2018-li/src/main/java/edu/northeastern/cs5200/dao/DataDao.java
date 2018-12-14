@@ -389,4 +389,219 @@ public class DataDao implements Dao<Data> {
 		}
 	}
 	
+	
+	@Override
+	public String createMappingTable(String table1, String table2,String id1, String id2) throws Exception {
+		Connection conn;
+		try {
+			String mappingTableName = table1 + "_" + table2;
+			conn = DriverManager.getConnection(MYSQL.JDBC_ADDRESS);
+			// 创建MappingTable
+			Statement createTableStmt = conn.createStatement();
+			String createTableStatementSQL = String
+					.format("CREATE TABLE IF NOT EXISTS %s(" 
+								+ "%s int NOT NULL,"
+								+ "%s int NOT NULL,"
+								+ "constraint %s foreign key (%s) references %s (id),"
+								+ "constraint %s foreign key (%s) references %s (id)"
+								+ ");", 
+							mappingTableName,
+							table1,
+							table2,
+							table1, table1, table1,
+							table2, table2, table2);
+			System.out.println(createTableStatementSQL);
+			createTableStmt.executeUpdate(createTableStatementSQL);
+			
+			// 插入MappingTable
+			Statement insertMappingDataStmt = conn.createStatement();
+			String insertMappingDataSQL = String.format("INSERT INTO %s(%s, %s)" + "VALUES (%s, %s);", 
+					mappingTableName, 
+					table1,
+					table2,
+					id1,
+					id2);
+			System.out.println(insertMappingDataSQL);
+			insertMappingDataStmt.executeUpdate(insertMappingDataSQL);
+			
+		} catch (Exception e) {
+			return String.format("{errorCode:-1003, message: %s}", e.toString());
+		}
+		
+		return new JSONObject(String.format("{table1:%s, id1:%s, table2:%s, id2:%s}", table1, id1, table2, id2)).toString();
+	}
+	
+	@Override
+	public JSONArray findMovieByActor(String table1, String table2, String id1) throws SQLException{
+		
+		Statement findMovieByActorStmt;
+		try {
+		findMovieByActorStmt = MYSQL.getConnection().createStatement();
+		
+		String findMovieByActorSQL = String.format("SELECT * FROM %s_%s where %s = %s", table1, table2, table1,id1);
+		System.out.println(findMovieByActorSQL);
+		ResultSet findMovieByActorSQLRS = findMovieByActorStmt.executeQuery(findMovieByActorSQL);
+		
+		// table data JSONArray String
+			String tableDataJSONString = "[";
+
+			if(findMovieByActorSQLRS.next()) {
+					ResultSetMetaData md = findMovieByActorSQLRS.getMetaData();
+					int columnCount = md.getColumnCount();
+					System.out.println(columnCount);
+
+					// row JSON string
+					String rowJSONString = "{";
+
+					for (int i = 1; i <= columnCount; i++) {
+						String columnName = md.getColumnName(i);
+						String columnValue = findMovieByActorSQLRS.getString(columnName);
+						rowJSONString += columnName + ": " + columnValue;
+						if (i != columnCount) {	
+							rowJSONString += ",";
+						}
+					}
+
+					rowJSONString += "}";
+
+					System.out.println(rowJSONString);
+
+					tableDataJSONString += rowJSONString;
+					if (!findMovieByActorSQLRS.isLast()) {
+						tableDataJSONString += ",";
+					}
+				}
+
+				tableDataJSONString += "]";
+
+				System.out.println(tableDataJSONString);
+
+				findMovieByActorSQLRS.close();
+				findMovieByActorStmt.close();
+				
+
+				return new JSONArray(tableDataJSONString);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+			e.printStackTrace();
+			}
+			return null;
+	}
+	
+	@Override
+	public JSONArray findActorByMovie(String tableName1, String tableName2, String id) throws SQLException {
+		// TODO Auto-generated method stub
+
+		// select the inserted row data from table
+		Statement findActorByMovieStmt;
+		try {
+			findActorByMovieStmt = MYSQL.getConnection().createStatement();
+		String findActorByMovieSQL = String.format("SELECT * FROM %s_%s WHERE %s = %s", tableName1, tableName2, tableName2, id);
+		System.out.println(findActorByMovieSQL);
+		ResultSet findActorByMovieRS = findActorByMovieStmt.executeQuery(findActorByMovieSQL);
+
+		// table data JSONArray String
+		String tableDataJSONString = "[";
+
+		while (findActorByMovieRS.next()) {
+			ResultSetMetaData md = findActorByMovieRS.getMetaData();
+			int columnCount = md.getColumnCount();
+
+			// row JSON string
+			String rowJSONString = "{";
+
+			for (int i = 1; i <= columnCount; i++) {
+				String columnName = md.getColumnName(i);
+				String columnValue = findActorByMovieRS.getString(columnName);
+				rowJSONString += columnName + ": " + columnValue;
+				if (i != columnCount) {	
+					rowJSONString += ",";
+				}
+			}
+
+			rowJSONString += "}";
+
+			System.out.println(rowJSONString);
+
+			tableDataJSONString += rowJSONString;
+			if (!findActorByMovieRS.isLast()) {
+				tableDataJSONString += ",";
+			}
+		}
+
+		tableDataJSONString += "]";
+
+		System.out.println(tableDataJSONString);
+
+		findActorByMovieRS.close();
+		findActorByMovieStmt.close();
+		
+
+		return new JSONArray(tableDataJSONString);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+
+	
+//	@Override
+//	public JSONArray findActorByMovie(String table1, String table2, String id2) throws SQLException{
+//
+//		try {
+//		Statement findActorByMovieStmt = MYSQL.getConnection().createStatement();
+//		
+//		String findActorByMovieSQL = String.format("SELECT * FROM %s_%s where %s = %s", table1, table2, table2, id2);
+//		System.out.println(findActorByMovieSQL);
+//		ResultSet findActorByMovieSQLRS = findActorByMovieStmt.executeQuery(findActorByMovieSQL);
+//		
+//		// table data JSONArray String
+//			String tableDataJSONString = "[";
+//
+//			if (findActorByMovieSQLRS.next()) {
+//					ResultSetMetaData md = findActorByMovieSQLRS.getMetaData();
+//					int columnCount = md.getColumnCount();
+//					System.out.println(columnCount);
+//
+//					// row JSON string
+//					String rowJSONString = "{";
+//
+//					for (int i = 1; i <= columnCount; i++) {
+//						String columnName = md.getColumnName(i);
+//						String columnValue = findActorByMovieSQLRS.getString(columnName);
+//						rowJSONString += columnName + ": " + columnValue;
+//						if (i != columnCount) {	
+//							rowJSONString += ",";
+//						}
+//					}
+//
+//					rowJSONString += "}";
+//
+//					System.out.println(rowJSONString);
+//
+//					tableDataJSONString += rowJSONString;
+//					if (!findActorByMovieSQLRS.isLast()) {
+//						tableDataJSONString += ",";
+//					}
+//				}
+//
+//				tableDataJSONString += "]";
+//
+//				System.out.println(tableDataJSONString);
+//
+//				findActorByMovieSQLRS.close();
+//				findActorByMovieStmt.close();
+//				
+//
+//				return new JSONArray(tableDataJSONString);
+//			} catch (ClassNotFoundException e) {
+//				// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			}
+//			return null;
+//	}
+	
+
 }
