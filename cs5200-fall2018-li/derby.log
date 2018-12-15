@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Thu Dec 13 01:45:14 EST 2018:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0167-a64f-e709-00000df6a0e8 
-on database directory memory:/Users/mengqi/Desktop/cs5200database/Extra_Assignment/cs5200-fall2018-li/testdb with class loader sun.misc.Launcher$AppClassLoader@4aa298b7 
+Fri Dec 14 19:06:08 EST 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0167-af2f-3d44-00001210eaf8 
+on database directory memory:/Users/mengqi/Desktop/cs5200database/Extra_Assignment/cs5200-fall2018-li/testdb with class loader sun.misc.Launcher$AppClassLoader@2a139a55 
 Loaded from file:/Users/mengqi/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_181-b13

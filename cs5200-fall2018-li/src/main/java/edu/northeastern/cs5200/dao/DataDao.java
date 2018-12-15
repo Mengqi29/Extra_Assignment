@@ -27,9 +27,7 @@ public class DataDao implements Dao<Data> {
 
 	@Override
 	public JSONArray getAll(String tableName) throws SQLException {
-		// TODO Auto-generated method stub
-
-//		Connection conn = DriverManager.getConnection(MYSQL.JDBC_ADDRESS);
+		// TODO Auto-generated method stu
 
 		// select the inserted row data from table
 		Statement selectTableDataStmt;
@@ -269,7 +267,6 @@ public class DataDao implements Dao<Data> {
 		String insertColumns = ""; // columns for insert
 		String insertValues = ""; // values for insert
 
-		// traverse through JSON keys which are table columns
 		Iterator<String> it = t.json.keys();
 		while (it.hasNext()) {
 			String column = it.next();
@@ -312,7 +309,6 @@ public class DataDao implements Dao<Data> {
 		String updateDataSQL = String.format("UPDATE %s SET %s = %s WHERE id = %s ", tableName, insertColumns,
 				insertValues,id);
 		System.out.println(updateDataSQL);
-//		PreparedStatement insertDataStmt = conn.prepareStatement(insertDataSQL, generatedColumns);
 		PreparedStatement upidateDataStmt = conn.prepareStatement(updateDataSQL);
 		upidateDataStmt.executeUpdate(updateDataSQL);
 		
@@ -396,7 +392,7 @@ public class DataDao implements Dao<Data> {
 		try {
 			String mappingTableName = table1 + "_" + table2;
 			conn = DriverManager.getConnection(MYSQL.JDBC_ADDRESS);
-			// 创建MappingTable
+			// Create MappingTable
 			Statement createTableStmt = conn.createStatement();
 			String createTableStatementSQL = String
 					.format("CREATE TABLE IF NOT EXISTS %s(" 
@@ -413,7 +409,7 @@ public class DataDao implements Dao<Data> {
 			System.out.println(createTableStatementSQL);
 			createTableStmt.executeUpdate(createTableStatementSQL);
 			
-			// 插入MappingTable
+			// Insert MappingTable
 			Statement insertMappingDataStmt = conn.createStatement();
 			String insertMappingDataSQL = String.format("INSERT INTO %s(%s, %s)" + "VALUES (%s, %s);", 
 					mappingTableName, 
@@ -445,7 +441,7 @@ public class DataDao implements Dao<Data> {
 		// table data JSONArray String
 			String tableDataJSONString = "[";
 
-			if(findMovieByActorSQLRS.next()) {
+			while(findMovieByActorSQLRS.next()) {
 					ResultSetMetaData md = findMovieByActorSQLRS.getMetaData();
 					int columnCount = md.getColumnCount();
 					System.out.println(columnCount);
@@ -492,7 +488,6 @@ public class DataDao implements Dao<Data> {
 	public JSONArray findActorByMovie(String tableName1, String tableName2, String id) throws SQLException {
 		// TODO Auto-generated method stub
 
-		// select the inserted row data from table
 		Statement findActorByMovieStmt;
 		try {
 			findActorByMovieStmt = MYSQL.getConnection().createStatement();
@@ -500,14 +495,12 @@ public class DataDao implements Dao<Data> {
 		System.out.println(findActorByMovieSQL);
 		ResultSet findActorByMovieRS = findActorByMovieStmt.executeQuery(findActorByMovieSQL);
 
-		// table data JSONArray String
 		String tableDataJSONString = "[";
 
 		while (findActorByMovieRS.next()) {
 			ResultSetMetaData md = findActorByMovieRS.getMetaData();
 			int columnCount = md.getColumnCount();
 
-			// row JSON string
 			String rowJSONString = "{";
 
 			for (int i = 1; i <= columnCount; i++) {
@@ -546,62 +539,39 @@ public class DataDao implements Dao<Data> {
 		
 	}
 
+	@Override
+	public void deleteMappingTableRow(String table1, String table2 , String id1, String id2){
+		
+		Connection conn;
+		try {
+			conn = DriverManager.getConnection(MYSQL.JDBC_ADDRESS);
+			Statement deleteMappingTableRowStmt = conn.createStatement();
+		
+			String deleteMappingTableRowSQL = String.format("DELETE FROM %s_%s WHERE %s = %s AND %s = %s", table1, table2, table1, id1, table2, id2);
+		
+			@SuppressWarnings("unused")
+			int deleteByIdRS = deleteMappingTableRowStmt.executeUpdate(deleteMappingTableRowSQL);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
-//	@Override
-//	public JSONArray findActorByMovie(String table1, String table2, String id2) throws SQLException{
-//
-//		try {
-//		Statement findActorByMovieStmt = MYSQL.getConnection().createStatement();
-//		
-//		String findActorByMovieSQL = String.format("SELECT * FROM %s_%s where %s = %s", table1, table2, table2, id2);
-//		System.out.println(findActorByMovieSQL);
-//		ResultSet findActorByMovieSQLRS = findActorByMovieStmt.executeQuery(findActorByMovieSQL);
-//		
-//		// table data JSONArray String
-//			String tableDataJSONString = "[";
-//
-//			if (findActorByMovieSQLRS.next()) {
-//					ResultSetMetaData md = findActorByMovieSQLRS.getMetaData();
-//					int columnCount = md.getColumnCount();
-//					System.out.println(columnCount);
-//
-//					// row JSON string
-//					String rowJSONString = "{";
-//
-//					for (int i = 1; i <= columnCount; i++) {
-//						String columnName = md.getColumnName(i);
-//						String columnValue = findActorByMovieSQLRS.getString(columnName);
-//						rowJSONString += columnName + ": " + columnValue;
-//						if (i != columnCount) {	
-//							rowJSONString += ",";
-//						}
-//					}
-//
-//					rowJSONString += "}";
-//
-//					System.out.println(rowJSONString);
-//
-//					tableDataJSONString += rowJSONString;
-//					if (!findActorByMovieSQLRS.isLast()) {
-//						tableDataJSONString += ",";
-//					}
-//				}
-//
-//				tableDataJSONString += "]";
-//
-//				System.out.println(tableDataJSONString);
-//
-//				findActorByMovieSQLRS.close();
-//				findActorByMovieStmt.close();
-//				
-//
-//				return new JSONArray(tableDataJSONString);
-//			} catch (ClassNotFoundException e) {
-//				// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			}
-//			return null;
-//	}
-	
-
+	@Override
+	public void deleteMappingTableRowByActor(String table1, String table2 , String id1){
+		
+		Connection conn;
+		try {
+			conn = DriverManager.getConnection(MYSQL.JDBC_ADDRESS);
+			Statement deleteMappingTableRowByActorStmt = conn.createStatement();
+		
+			String deleteMappingTableRowByActorSQL = String.format("DELETE FROM %s_%s where %s = %s ", table1, table2, table1, id1);
+		
+			@SuppressWarnings("unused")
+			int deleteMappingTableRowByActor = deleteMappingTableRowByActorStmt.executeUpdate(deleteMappingTableRowByActorSQL);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
